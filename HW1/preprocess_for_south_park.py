@@ -52,43 +52,6 @@ def parse_scripts(path):
         for c, d in zip(characters, dialogs):
             file.write(f"{c}: {d}\n")
 
-def parse_scripts2(path):
-    char = []
-    texts = []
-    flag = None
-
-    for ind in range(1, len(path) - 1):
-
-        prev_line = path[ind - 1]
-        line = path[ind]
-        next_line = path[ind + 1]
-
-        if not line:
-            continue
-
-        elif line.isupper() and not prev_line and next_line:
-            line = re.sub(r'\([^)]*\)', '', line)
-            char.append(line)
-            flag = "char"
-
-        elif flag == "char" and line:
-            text = line
-            flag = "text"
-            if not next_line:
-                texts.append(text)
-                flag = None
-
-        elif flag == "text" and line:
-            text += " " + line
-            flag = "text"
-            if not next_line:
-                texts.append(text)
-                flag = None
-
-    with open("./raw/test.txt", 'w') as file:
-        for c, d in zip(char, texts):
-            file.write(f"{c}: {d}\n")
-
 def df_scripts(path):
     """function take preprocessed_script.txt from dir and create dataframes"""
     chars = []

@@ -4,8 +4,9 @@ import re
 import pandas as pd
 import numpy as np
 import nltk
+from tqdm import tqdm
 from preprocess_for_south_park import parse_scripts, df_scripts, collect_df, form_df
-from parse_transcripts_for_south_park import get_transcripts_from_url
+from parse_transcripts_for_south_park import get_transcripts_from_url, get_text_from_html, clean_and_write_text
 
 """
 Done! Congratulations on your new bot. You will find it at t.me/CartmanHW_bot. 
@@ -20,19 +21,19 @@ Keep your token secure and store it safely, it can be used by anyone to control 
 
 For a description of the Bot API, see this page: https://core.telegram.org/bots/api
 """
-
+raw_texts_exists = True # change on False to download transcripts and preprocess them
 # parse data from website to get txt transcripts
 # 'https://imsdb.com/TV/South%20Park.html' page from IMDBs website with transcripts
-transcript_names = get_transcripts_from_url('https://imsdb.com/TV/South%20Park.html')
-print(transcript_names)
+transcript_paths = get_transcripts_from_url('https://imsdb.com/TV/South%20Park.html')
+print(transcript_paths)
 
 
 # define list with certain scripts from south park
-dir_list = [file for file in os.listdir("./raw_scripts")]
-
-# remove all except dialogs
-for script in dir_list:
-    parse_scripts(script)
+# dir_list = [file for file in os.listdir("./raw_scripts")]
+if not raw_texts_exists:
+    for path in tqdm(transcript_paths):
+        raw_text = get_text_from_html(path)
+        clean_and_write_text(raw_text, path)
 
 # form pandas dataset from preprocessed scripts
 # define list with certain scripts from south park
@@ -49,6 +50,5 @@ df = form_df(df, "CARTMAN")
 
 # create final dataframe for tf-idf
 df.to_csv("south_park.csv", index=False)
-print(df)
 print("file created")
 

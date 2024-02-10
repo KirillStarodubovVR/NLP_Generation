@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import os
 
 
 def get_transcripts_from_url(url):
@@ -51,10 +52,16 @@ def get_text_from_html(url):
         else:
             final_list.append(cur_line)
 
+    new_name = url.split("/")[-1].replace(".html", ".txt").replace("-", "_")
+
+    with open(os.path.join("raw_scripts", new_name), 'w', encoding='utf-8') as file:
+        for line in final_list:
+            file.write(line + "\n")
+
     return final_list
 
 
-def clean_text(data):
+def clean_and_write_text(data, path):
     char = []
     texts = []
     flag = None
@@ -87,6 +94,8 @@ def clean_text(data):
                 texts.append(text)
                 flag = None
 
-    with open("./raw/test.txt", 'w') as file:
+    new_name = path.split("/")[-1].replace(".html", ".txt").replace("-", "_")
+
+    with open(os.path.join("preprocessed_scripts", new_name), 'w', encoding='utf-8') as file:
         for c, d in zip(char, texts):
             file.write(f"{c}: {d}\n")
