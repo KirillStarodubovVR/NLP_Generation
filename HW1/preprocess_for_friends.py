@@ -11,7 +11,7 @@ def df_scripts(path):
     chars = []
     texts = []
 
-    with open(os.path.join("friends_preprocessed_scripts", path), 'r') as file:
+    with open(os.path.join("friends_preprocessed_scripts", path), 'r', encoding="utf-8") as file:
         for line in file:
             char, text = line.split(":", 1)
             chars.append(char)
@@ -29,12 +29,11 @@ def collect_df():
         dfs.append(pd.read_csv(os.path.join("dataframes", "friends", file)))
     df = pd.concat(dfs, ignore_index=True)
     print(df["Characters"].value_counts()[:10])
-    print(df["Characters"].unique())
     return df
 
 
 def form_df(df, char):
-    # get indices where character is CARTMAN
+    # get indices where character is favorite_character
     cartman_df = df[df.Characters == char].dropna()
     cartman_ind = cartman_df.index.tolist()
 

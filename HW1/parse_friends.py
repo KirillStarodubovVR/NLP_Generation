@@ -40,61 +40,78 @@ def get_text_from_html(url):
 
     txt_name = path.split("/")[-1].replace(".html", ".txt")
 
-    final_transcript = []
-
     with open(os.path.join("friends_raw_scripts", txt_name), 'w', encoding='utf-8') as file:
-        for t in transcript:
-            line = t.get_text(strip=False)
-            line = line.replace('"', "'").replace("\n", " ")
-            file.write(line + "\n")
-            final_transcript.append(line)
+        text = soup.get_text(strip=False).lower()
+        file.write(text + "\n")
 
-    return final_transcript
+    return txt_name
 
 
-def clean_and_write_text(data, path):
+def clean_and_write_text(transcript_name):
+
     char = []
     texts = []
     flag = None
     pattern = re.compile(r'\b\w+:')
 
-    for ind in range(0, len(data) - 1):
+    with open(os.path.join("friends_raw_scripts", transcript_name), 'r', encoding='utf-8') as file:
+        final_transcript = file.readlines()
 
-        line = data[ind].lower()
-        line = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", '', line)
-        line = line.strip().replace("\n", " ")
+    skip_lines = 10
+    pattern = re.compile(r'\b\w+:')
+    scene_words = ["commercial break", "closing credits", "opening credits", "end"]
+    for ind in range(1, len(final_transcript) - 1):
+        final_list = []
 
-        next_line = data[ind + 1].lower()
-        next_line = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", '', next_line).strip()
+        pre_line = final_transcript[ind - 1].strip()
+        cur_line = final_transcript[ind].strip()
+        next_line = final_transcript[ind + 1].strip()
 
-        if next_line in ["commercial break", "closing credits", "opening credits", "end"]:
-            next_line = ""
+        next_condition = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", '', next_line).strip()
+        cur_conditon = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", '', cur_line).strip()
 
-        if "written by:" in line or not line or "opening credits" in line or line in ["commercial break",
-                                                                                      "closing credits",
-                                                                                      "opening credits"]:
+        if sum([bool(pre_line), bool(cur_line), bool(next_line)]) == 1:
             continue
 
-        elif pattern.search(line):
-            name, text = line.split(":", maxsplit=1)
+        elif cur_line in scene_words:
+            continue
+
+        elif "by:" in cur_line or "note:" in cur_line:
+            continue
+
+        elif "[" in cur_line or "]" in cur_line:
+            continue
+
+        elif not cur_conditon:
+            continue
+
+        elif pattern.search(cur_line) and flag == None:
+            name, text = cur_line.split(":", maxsplit=1)
             char.append(name)
             text = re.sub(r'\([^)]*\)', '', text)
             text = text.strip()
+            flag = "char"
 
-            if pattern.search(next_line) or not next_line:
+            if pattern.search(next_line) or not next_condition or next_line in scene_words or "[" in next_line:
                 texts.append(text)
+                flag = None
 
-        elif line:
-            text += " " + line
-            if pattern.search(next_line) or not next_line:
+                if len(char) != len(texts):
+                    print(ind)
+                    print(char[-1], texts[-1])
+
+        elif cur_line and flag == 'char':
+            text += " " + cur_line
+            if pattern.search(next_line) or not next_condition or next_line in scene_words or "[" in next_line:
+                text = re.sub(r"\([^()]*\)|\[[^\[\]]*\]", '', text).strip()
                 texts.append(text)
+                flag = None
 
-        # if len(char) != len(texts):
-        #     print(line)
-        #     print(ind)
+                if len(char) != len(texts):
+                    print(ind)
+                    print(char[-1], texts[-1])
 
-    txt_name = path.split("/")[-1].replace(".html", ".txt")
-    new_name = "pre_" + txt_name
+    new_name = "pre_" + transcript_name
     with open(os.path.join("friends_preprocessed_scripts", new_name), 'w', encoding='utf-8') as file:
         for c, d in zip(char, texts):
             file.write(f"{c}: {d}\n")
