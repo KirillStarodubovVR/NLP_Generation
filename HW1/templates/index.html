@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <form action="/chat" method="post">
+        <input type="text" name="user_message" placeholder="Type your message here">
+        <input type="submit" value="Send">
+    </form>
+    {% if user_message %}
+    <p>You: {{ user_message }}</p>
+    {% endif %}
+    {% if bot_reply %}
+    <p>Bot: {{ bot_reply }}</p>
+    {% endif %}
+</body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Chatbot with Image</title>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Chatbot with Image</h1>-->
+<!--    <img src="{{ url_for('static', filename='example.jpeg') }}" alt="Chatbot Image">-->
+<!--    <form action="/chat" method="post">-->
+<!--        <input type="text" name="user_message" placeholder="Type your message here">-->
+<!--        <input type="submit" value="Send">-->
+<!--    </form>-->
+<!--    {% if user_message %}-->
+<!--    <p>You: {{ user_message }}</p>-->
+<!--    {% endif %}-->
+<!--    {% if bot_reply %}-->
+<!--    <p>Bot: {{ bot_reply }}</p>-->
+<!--    {% endif %}-->
+<!--</body>-->
+<!--</html>-->

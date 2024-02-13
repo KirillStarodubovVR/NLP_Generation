@@ -52,6 +52,7 @@ def parse_scripts(path):
         for c, d in zip(characters, dialogs):
             file.write(f"{c}: {d}\n")
 
+
 def df_scripts(path):
     """function take preprocessed_script.txt from dir and create dataframes"""
     chars = []
@@ -65,14 +66,14 @@ def df_scripts(path):
 
     df_name = path.replace("prep_SP_", "df_").replace(".txt", ".csv")
     df = pd.DataFrame({'Characters': chars, 'Dialogs': texts})
-    df.to_csv(os.path.join("dataframes", df_name), index=False)
+    df.to_csv(os.path.join("dataframes", "south_park", df_name), index=False)
 
 
 def collect_df():
     """function concatenate dataframes in one single dataframe"""
     dfs = []
-    for file in os.listdir("dataframes"):
-        dfs.append(pd.read_csv(os.path.join("dataframes", file)))
+    for file in os.listdir("dataframes/south_park"):
+        dfs.append(pd.read_csv(os.path.join("dataframes", "south_park", file)))
     df = pd.concat(dfs, ignore_index=True)
     print(df["Characters"].value_counts()[:5])
     print(df["Characters"].unique())
@@ -91,7 +92,7 @@ def form_df(df, char):
     cartman_dialog = df.iloc[cartman_ind]
     text_to_cartman = df.iloc[dialog_ind].dropna(subset=["Dialogs"])
     # remove from text to cartman rows where speak Cartman
-    text_to_cartman = text_to_cartman[text_to_cartman["Characters"] != "CARTMAN"]
+    text_to_cartman = text_to_cartman[text_to_cartman["Characters"] != char]
 
     # save data for debugging. Uncomment if necessary
     # cartman_dialog.to_csv("test_cartman.csv", index=cartman_ind)
