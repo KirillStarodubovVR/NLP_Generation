@@ -41,7 +41,7 @@ def get_text_from_html(url):
     txt_name = path.split("/")[-1].replace(".html", ".txt")
 
     with open(os.path.join("friends_raw_scripts", txt_name), 'w', encoding='utf-8') as file:
-        text = soup.get_text(strip=False).lower()
+        text = soup.get_text(strip=False).lower().replace("'", ""). replace('"', "").replace("\xa0", "")
         file.write(text + "\n")
 
     return txt_name

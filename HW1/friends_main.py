@@ -6,7 +6,7 @@ import os
 
 from tqdm import tqdm
 from parse_friends import get_transcripts_from_url, get_text_from_html, clean_and_write_text
-from preprocess_for_friends import df_scripts, collect_df, form_df
+from preprocess_for_friends import df_scripts, collect_df, form_df, form_df_negative
 
 raw_texts_exists = True  # change on False to download transcripts and preprocess them
 # parse data from website to get txt transcripts
@@ -26,11 +26,18 @@ for preprocessed_script in dir_list:
 
 # concatenate data in one single dataframe
 df = collect_df()
+df.to_csv("full_trancscripts.csv", index=False)
 
 # form the final dataset for tf-idf / word2vec, which no need labels between strings
-df = form_df(df, "ross")
+characters = ["rachel", "ross", "chandler", "monica", "joey", "phoebe"]
 
-# create final dataframe for tf-idf
-df.to_csv("friends.csv", index=False)
-print("file created")
+for char in tqdm(characters):
+    df_char = form_df(df, char)
+    # create final dataframe
+    df_char.to_csv(char + "_friends.csv", index=False)
+
+    df_char_label = form_df_negative(df, df_char, char)
+    df_char_label.to_csv(char + "_friends_label.csv", index=False)
+
+print("script created")
 
